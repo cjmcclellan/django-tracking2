@@ -216,8 +216,8 @@ class PageviewManager(models.Manager):
                     stats['url_stats'].append({'url': url, 'total_count': count,
                                                'unique_count': pageviews.filter(url__contains=url).values('visitor').distinct().count()})
 
-        reader = geoip2.database.Reader('./GeoLite2-City_20190813/GeoLite2-City.mmdb')
-        a = '{0}, {1}'.format(reader.city('128.12.146.31').city.names['en'], reader.city('128.12.146.31').country.names['en'])
+        # reader = geoip2.database.Reader('./GeoLite2-City_20190813/GeoLite2-City.mmdb')
+        # a = '{0}, {1}'.format(reader.city('128.12.146.31').city.names['en'], reader.city('128.12.146.31').country.names['en'])
 
         stats['total'] = total_views = pageviews.count()
         unique_count = 0
