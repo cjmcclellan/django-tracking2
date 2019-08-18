@@ -23,9 +23,16 @@ from tracking.settings import (
     TRACK_QUERY_STRING,
     TRACK_REFERER,
     TRACK_SUPERUSERS,
+    TRACK_SELECTED_URLS
 )
 
 track_ignore_urls = [re.compile(x) for x in TRACK_IGNORE_URLS]
+
+if TRACK_SELECTED_URLS is not None:
+    track_selected_urls = [re.compile(x) for x in TRACK_SELECTED_URLS]
+else:
+    track_selected_urls = None
+
 track_ignore_user_agents = [
     re.compile(x, re.IGNORECASE) for x in TRACK_IGNORE_USER_AGENTS
 ]
@@ -65,6 +72,16 @@ class VisitorTrackingMiddleware(MiddlewareMixin):
         if user and user.is_superuser and not TRACK_SUPERUSERS:
             return False
 
+        # only track if the track_selected_urls has objects
+        path = request.path_info.lstrip('/')
+        flag = False
+        if track_selected_urls is not None:
+            for url in track_selected_urls:
+                if url.match(path):
+                    flag = True
+                    break
+            if not flag:
+                return False
         # Do not track ignored urls
         path = request.path_info.lstrip('/')
         for url in track_ignore_urls:

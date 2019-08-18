@@ -5,8 +5,9 @@ from django.utils import timezone
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models import Count, Avg
-from tracking.settings import TRACK_PAGEVIEWS, TRACK_ANONYMOUS_USERS
+from tracking.settings import TRACK_PAGEVIEWS, TRACK_ANONYMOUS_USERS, TRACK_SELECTED_URLS
 from tracking.cache import CacheManager
+import geoip2.database
 
 
 class VisitorManager(CacheManager):
@@ -198,10 +199,25 @@ class PageviewManager(models.Manager):
             visitor__start_time__gte=start_date,
         ).select_related('visitor')
 
+        # get all the unique urls
+
         stats = {
             'total': 0,
             'unique': 0,
+            'url_stats': [],
         }
+
+        # go through all the selected urls and count up
+        if TRACK_SELECTED_URLS is not None:
+            for url in TRACK_SELECTED_URLS:
+                url = url.lstrip('^')
+                count = pageviews.filter(url__contains=url).count()
+                if count > 0:
+                    stats['url_stats'].append({'url': url, 'total_count': count,
+                                               'unique_count': pageviews.filter(url__contains=url).values('visitor').distinct().count()})
+
+        reader = geoip2.database.Reader('./GeoLite2-City_20190813/GeoLite2-City.mmdb')
+        a = '{0}, {1}'.format(reader.city('128.12.146.31').city.names['en'], reader.city('128.12.146.31').country.names['en'])
 
         stats['total'] = total_views = pageviews.count()
         unique_count = 0
