@@ -8,6 +8,7 @@ from django.db.models import Count, Avg
 from tracking.settings import TRACK_PAGEVIEWS, TRACK_ANONYMOUS_USERS, TRACK_SELECTED_URLS
 from tracking.cache import CacheManager
 import geoip2.database
+import os
 
 
 class VisitorManager(CacheManager):
@@ -187,7 +188,7 @@ class VisitorManager(CacheManager):
 
 
 class PageviewManager(models.Manager):
-    def stats(self, start_date=None, end_date=None, registered_only=False):
+    def stats(self, start_date=None, end_date=None, registered_only=False, filter_visitors=None):
         """Returns a dictionary of pageviews including:
 
             * total pageviews
@@ -206,6 +207,13 @@ class PageviewManager(models.Manager):
             'unique': 0,
             'url_stats': [],
         }
+        
+        visitor_stats = {
+            
+        }
+
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        ip_reader = geoip2.database.Reader(os.path.join(dir_path, 'GeoLite2-City_20190813/GeoLite2-City.mmdb'))
 
         # go through all the selected urls and count up
         if TRACK_SELECTED_URLS is not None:
@@ -213,9 +221,24 @@ class PageviewManager(models.Manager):
                 url = url.lstrip('^')
                 count = pageviews.filter(url__contains=url).count()
                 if count > 0:
+                    # create the visitor list
+                    visitors = []
+                    for ip, agent in zip(list(pageviews.filter(url__contains=url).values('visitor__ip_address')),
+                                         list(pageviews.filter(url__contains=url).values('visitor__user_agent'))):
+                        ip = ip['visitor__ip_address']
+                        agent = agent['visitor__user_agent']
+                        try:
+                            visitors.append((ip,
+                                             '{0}, {1}'.format(ip_reader.city(ip).city.names['en'], ip_reader.city(ip).country.names['en']),
+                                             agent))
+                        except:
+                            visitors.append((ip, 'Could not find location.', agent))
+                            # print('{0}, {1}'.format(ip_reader.city(ip).city.names['en'], ip_reader.city(ip).country.names['en']))
                     stats['url_stats'].append({'url': url, 'total_count': count,
-                                               'unique_count': pageviews.filter(url__contains=url).values('visitor').distinct().count()})
-
+                                               'unique_count': pageviews.filter(url__contains=url).values('visitor').distinct().count(),
+                                               'visitors': visitors
+                                               })
+                    # visitor_stats[]
         # reader = geoip2.database.Reader('./GeoLite2-City_20190813/GeoLite2-City.mmdb')
         # a = '{0}, {1}'.format(reader.city('128.12.146.31').city.names['en'], reader.city('128.12.146.31').country.names['en'])
 

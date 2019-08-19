@@ -125,6 +125,9 @@
                 <th>{{ url_stat.url }}</th>
                 <td>{{ url_stat.total_count }}</td>
                 <td>{{ url_stat.unique_count }}</td>
+                {% for visitor in url_stat.visitors %}
+                    <td>{{ visitor }}</td>
+                {% endfor %}
             </tr>
             {% endfor %}
         </tbody>
