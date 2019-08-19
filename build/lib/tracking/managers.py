@@ -213,7 +213,7 @@ class PageviewManager(models.Manager):
         }
 
         dir_path = os.path.dirname(os.path.realpath(__file__))
-        ip_reader = geoip2.database.Reader(os.path.join(dir_path, 'GeoLite2-City_20190813/GeoLite2-City.mmdb'))
+        ip_reader = geoip2.database.Reader(os.path.join(dir_path, '/templates/tracking/GeoLite2-City_20190813/GeoLite2-City.mmdb'))
 
         # go through all the selected urls and count up
         if TRACK_SELECTED_URLS is not None:
