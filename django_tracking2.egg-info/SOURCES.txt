@@ -22,4 +22,11 @@ tracking/migrations/0001_initial.py
 tracking/migrations/0002_auto_20180918_2014.py
 tracking/migrations/__init__.py
 tracking/templates/tracking/dashboard.html
+tracking/templates/tracking/GeoLite2-City_20190813/COPYRIGHT.txt
+tracking/templates/tracking/GeoLite2-City_20190813/GeoLite2-City.mmdb
+tracking/templates/tracking/GeoLite2-City_20190813/LICENSE.txt
+tracking/templates/tracking/GeoLite2-City_20190813/README.txt
+tracking/templates/tracking/GeoLite2-Country_20190813/COPYRIGHT.txt
+tracking/templates/tracking/GeoLite2-Country_20190813/GeoLite2-Country.mmdb
+tracking/templates/tracking/GeoLite2-Country_20190813/LICENSE.txt
 tracking/templates/tracking/snippets/stats.html
