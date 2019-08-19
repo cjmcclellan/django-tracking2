@@ -1,10 +1,10 @@
 *.sw?
 *.py?
 *~
-*.egg-info
-*.egg/
+#*.egg-info
+#*.egg/
 .DS_Store
-dist
+# dist
 MANIFEST
 .coverage
 htmlcov/
