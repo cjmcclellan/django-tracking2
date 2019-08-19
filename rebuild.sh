@@ -1,4 +1,4 @@
 rm -r ./build
 rm -r ./dist
-rm -r ./Dash_cjm.egg-info
+rm -r ./django_tracking2.egg-info
 python setup.py install
