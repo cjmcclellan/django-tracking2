@@ -70,6 +70,7 @@ def dashboard(request):
 
 
 # Create your views here.
+@permission_required('tracking.visitor_log')
 class ConDashboard(TemplateView):
 
     template_name = 'tracking/pageview.html'
