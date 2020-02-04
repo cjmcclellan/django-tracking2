@@ -1,6 +1,7 @@
 import logging
 
 from datetime import timedelta
+from django.views.generic import TemplateView
 
 from django import forms
 from django.shortcuts import render
@@ -66,3 +67,18 @@ def dashboard(request):
         'pageview_stats': pageview_stats,
     }
     return render(request, 'tracking/dashboard.html', context)
+
+
+# Create your views here.
+class ConDashboard(TemplateView):
+
+    template_name = 'tracking/pageview.html'
+
+    def get(self, request, *args, **kwargs):
+
+        pageview_stats = Pageview.objects.stats()
+
+        context = {
+            'pageview_stats': pageview_stats,
+        }
+        return render(request, self.template_name, context)
