@@ -195,10 +195,13 @@ class PageviewManager(models.Manager):
 
         for all users, registered users and guests.
         """
-        pageviews = self.filter(
-            visitor__start_time__lt=end_date,
-            visitor__start_time__gte=start_date,
-        ).select_related('visitor')
+        if start_date is None and end_date is None:
+            pageviews = self.select_related('visitor')
+        else:
+            pageviews = self.filter(
+                visitor__start_time__lt=end_date,
+                visitor__start_time__gte=start_date,
+            ).select_related('visitor')
 
         # get all the unique urls
 
@@ -213,7 +216,7 @@ class PageviewManager(models.Manager):
         }
 
         dir_path = os.path.dirname(os.path.realpath(__file__))
-        ip_reader = geoip2.database.Reader(os.path.join(dir_path, '/templates/tracking/GeoLite2-City_20190813/GeoLite2-City.mmdb'))
+        ip_reader = geoip2.database.Reader(os.path.join(dir_path, 'templates/tracking/GeoLite2-City_20190813/GeoLite2-City.mmdb'))
 
         # go through all the selected urls and count up
         if TRACK_SELECTED_URLS is not None:
@@ -223,16 +226,21 @@ class PageviewManager(models.Manager):
                 if count > 0:
                     # create the visitor list
                     visitors = []
-                    for ip, agent in zip(list(pageviews.filter(url__contains=url).values('visitor__ip_address')),
-                                         list(pageviews.filter(url__contains=url).values('visitor__user_agent'))):
-                        ip = ip['visitor__ip_address']
-                        agent = agent['visitor__user_agent']
+                    for pageview in pageviews.filter(url__contains=url):
+                    # for ip, agent in zip(list(pageviews.filter(url__contains=url).values('visitor__ip_address')),
+                    #                      list(pageviews.filter(url__contains=url).values('visitor__user_agent'))):
+
+                        ip = pageview.visitor.ip_address
+                        agent = pageview.visitor.user_agent
+                        time = pageview.view_time
+                        # try to get the locaton
                         try:
-                            visitors.append((ip,
-                                             '{0}, {1}'.format(ip_reader.city(ip).city.names['en'], ip_reader.city(ip).country.names['en']),
-                                             agent))
+                            location = '{0}, {1}'.format(ip_reader.city(ip).city.names['en'], ip_reader.city(ip).country.names['en'])
                         except:
-                            visitors.append((ip, 'Could not find location.', agent))
+                            location = 'Could not find location'
+
+                        visitors.append({'ip': ip, 'location': location, 'agent': agent, 'time': time})
+
                             # print('{0}, {1}'.format(ip_reader.city(ip).city.names['en'], ip_reader.city(ip).country.names['en']))
                     stats['url_stats'].append({'url': url, 'total_count': count,
                                                'unique_count': pageviews.filter(url__contains=url).values('visitor').distinct().count(),
