@@ -6,6 +6,7 @@ from django.views.generic import TemplateView
 from django import forms
 from django.shortcuts import render
 from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.timezone import now
 
 from tracking.models import Visitor, Pageview
@@ -70,8 +71,8 @@ def dashboard(request):
 
 
 # Create your views here.
-@permission_required('tracking.visitor_log')
-class ConDashboard(TemplateView):
+# @permission_required('tracking.visitor_log')
+class ConDashboard(LoginRequiredMixin, TemplateView):
 
     template_name = 'tracking/pageview.html'
 
