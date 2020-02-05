@@ -1,0 +1,39 @@
+{% extends 'congo/includes/cards/simple_card_list_search.html' %}
+
+{% block card_title %}
+    Tracking the Page Views
+{% endblock %}
+
+{% block header %}
+{#        <th></th>#}
+{#        <th>Total</th>#}
+{#        <th>Unique Visitors</th>#}
+    <th>Url</th>
+    <th>IP Address</th>
+    <th>Location</th>
+    <th>Agent</th>
+    <th>Time</th>
+{% endblock %}
+
+{% block data %}
+    {% for url_stat in pageview_stats.url_stats %}
+        {% for visitor in url_stat.visitors %}
+            <tr>
+                <td>{{ url_stat.url }}</td>
+                <td>{{ visitor.ip }}</td>
+                <td>{{ visitor.location }}</td>
+                <td>{{ visitor.agent }}</td>
+                <td>{{ visitor.time }}</td>
+            </tr>
+        {% endfor %}
+    {% endfor %}
+
+{#    <tr>#}
+{#        <td>{{ url_stat.url }}</td>#}
+{#        <td>{{ url_stat.total_count }}</td>#}
+{#        <td>{{ url_stat.unique_count }}</td>#}
+{#        {% for visitor in url_stat.visitors %}#}
+{#            <td>{{ visitor }}</td>#}
+{#        {% endfor %}#}
+{#    </tr>#}
+{% endblock %}
