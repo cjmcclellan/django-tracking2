@@ -31,22 +31,41 @@ ALLOWED_HOSTS = []
 TRACK_PAGEVIEWS = True
 GEOIP_PATH = os.path.join(BASE_DIR, 'geoip')
 
+# TRACK_IGNORE_URLS = [r'^tracking/', r'^django_plotly_dash/']
+TRACK_SELECTED_URLS = [r'^', r'^/']
+
+# TEMPLATES = [
+#     {
+#         'BACKEND': 'django.template.backends.django.DjangoTemplates',
+#         'APP_DIRS': True,
+#         'OPTIONS': {
+#             'context_processors': [
+#                 'django.contrib.auth.context_processors.auth',
+#                 'django.template.context_processors.debug',
+#                 'django.template.context_processors.i18n',
+#                 'django.template.context_processors.media',
+#                 'django.template.context_processors.static',
+#                 'django.template.context_processors.tz',
+#                 'django.contrib.messages.context_processors.messages',
+#                 'congo'
+#             ],
+#         },
+#     }
+# ]
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [(os.path.join(BASE_DIR, 'templates'))],  # include the global templates directory
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
-                'django.contrib.auth.context_processors.auth',
                 'django.template.context_processors.debug',
-                'django.template.context_processors.i18n',
-                'django.template.context_processors.media',
-                'django.template.context_processors.static',
-                'django.template.context_processors.tz',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
         },
-    }
+    },
 ]
 
 INSTALLED_APPS = (
@@ -56,9 +75,10 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
+    # 'congo'
     # add tracking as INSTALLED_APPS
     'tracking',
+    'congo'
 )
 
 if django.VERSION < (1, 10):

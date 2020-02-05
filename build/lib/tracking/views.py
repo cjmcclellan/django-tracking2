@@ -1,10 +1,12 @@
 import logging
 
 from datetime import timedelta
+from django.views.generic import TemplateView
 
 from django import forms
 from django.shortcuts import render
 from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.timezone import now
 
 from tracking.models import Visitor, Pageview
@@ -66,3 +68,19 @@ def dashboard(request):
         'pageview_stats': pageview_stats,
     }
     return render(request, 'tracking/dashboard.html', context)
+
+
+# Create your views here.
+# @permission_required('tracking.visitor_log')
+class ConDashboard(LoginRequiredMixin, TemplateView):
+
+    template_name = 'tracking/pageview.html'
+
+    def get(self, request, *args, **kwargs):
+
+        pageview_stats = Pageview.objects.stats()
+
+        context = {
+            'pageview_stats': pageview_stats,
+        }
+        return render(request, self.template_name, context)

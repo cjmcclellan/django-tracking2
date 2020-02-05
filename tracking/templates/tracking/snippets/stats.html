@@ -110,6 +110,8 @@
             {% endif %}
         </tbody>
     </table>
+<h3>Views Overtime</h3>
+
 <h3>Pageviews by url</h3>
     <table>
         <thead>
@@ -132,7 +134,27 @@
             {% endfor %}
         </tbody>
     </table>
-
+<!--<table>-->
+<!--        <thead>-->
+<!--            <tr>-->
+<!--                <th></th>-->
+<!--                <th>Total</th>-->
+<!--                <th>Unique Visitors</th>-->
+<!--            </tr>-->
+<!--        </thead>-->
+<!--        <tbody>-->
+<!--            {% for url_stat in pageview_stats.url_stats %}-->
+<!--            <tr>-->
+<!--                <th>{{ url_stat.url }}</th>-->
+<!--                <td>{{ url_stat.total_count }}</td>-->
+<!--                <td>{{ url_stat.unique_count }}</td>-->
+<!--                {% for visitor in url_stat.visitors %}-->
+<!--                    <td>{{ visitor }}</td>-->
+<!--                {% endfor %}-->
+<!--            </tr>-->
+<!--            {% endfor %}-->
+<!--        </tbody>-->
+<!--    </table>-->
     {% else %}
         <p>No pageview stats available</p>
     {% endif %}
