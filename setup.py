@@ -6,6 +6,7 @@ kwargs = {
     'include_package_data': True,
     'install_requires': [
         'django>=1.8',
+        'geoip2'
     ],
     'name': 'django-tracking2',
     'version': __import__('tracking').get_version(),
