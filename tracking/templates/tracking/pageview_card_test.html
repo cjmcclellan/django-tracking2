@@ -1,0 +1,18 @@
+{#{% extends 'congo/includes/cards/simple_card.html' %}#}
+
+{% load plotly_dash %}
+{##}
+{#{% block card_title %}#}
+{#    Tracking the Page Views#}
+{#{% endblock %}#}
+
+
+{#{% block card_body %}#}
+{#    <div class="{% plotly_class name="tracking_time" template_type="div-direct" %}">#}
+{#        {% plotly_direct name="tracking_time" %}#}
+{#    </div>#}
+    <div class="{% plotly_class name="test" template_type="div-direct" %}">
+        {% plotly_direct name="test" %}
+    </div>
+
+{#{% endblock %}#}

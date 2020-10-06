@@ -5,6 +5,10 @@ from django.utils import timezone
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models import Count, Avg
+from django.db.models import Q
+import operator
+from functools import reduce
+
 from tracking.settings import TRACK_PAGEVIEWS, TRACK_ANONYMOUS_USERS, TRACK_SELECTED_URLS
 from tracking.cache import CacheManager
 import geoip2.database
@@ -188,20 +192,33 @@ class VisitorManager(CacheManager):
 
 
 class PageviewManager(models.Manager):
-    def stats(self, start_date=None, end_date=None, registered_only=False, filter_visitors=None):
+    def stats(self, start_date=None, end_date=None, registered_only=False, filter_agents=None, remove_locations=None):
         """Returns a dictionary of pageviews including:
 
             * total pageviews
 
         for all users, registered users and guests.
         """
-        if start_date is None and end_date is None:
+
+        # tracker for all the exact locations
+        geo_location = {'None': {'lat': None, 'lon': None, 'count': 0}}
+
+        if remove_locations is None:
+            remove_locations = []
+
+        if start_date is None or end_date is None:
             pageviews = self.select_related('visitor')
         else:
             pageviews = self.filter(
                 visitor__start_time__lt=end_date,
                 visitor__start_time__gte=start_date,
             ).select_related('visitor')
+
+        # filter out agents from the pageviews
+        if filter_agents is not None:
+            for agent in filter_agents:
+                pageviews = pageviews.exclude(visitor__user_agent__contains=agent)
+                # pageviews = pageviews.exclude(reduce(operator.and_, (Q(visitor__user_agent__contains=x) for x in filter_agents)))
 
         # get all the unique urls
 
@@ -210,19 +227,27 @@ class PageviewManager(models.Manager):
             'unique': 0,
             'url_stats': [],
         }
-        
+
         visitor_stats = {
-            
+
         }
 
         dir_path = os.path.dirname(os.path.realpath(__file__))
         ip_reader = geoip2.database.Reader(os.path.join(dir_path, 'templates/tracking/GeoLite2-City_20190813/GeoLite2-City.mmdb'))
+
+        ip_track = []
+
+        # lets also track the daily views
+        daily_views = {}
+
 
         # go through all the selected urls and count up
         if TRACK_SELECTED_URLS is not None:
             for url in TRACK_SELECTED_URLS:
                 url = url.lstrip('^')
                 count = pageviews.filter(url__contains=url).count()
+                actual_count = 0
+                unique_count = 0
                 if count > 0:
                     # create the visitor list
                     visitors = []
@@ -234,16 +259,43 @@ class PageviewManager(models.Manager):
                         agent = pageview.visitor.user_agent
                         time = pageview.view_time
                         # try to get the locaton
+                        add_location = False
                         try:
                             location = '{0}, {1}'.format(ip_reader.city(ip).city.names['en'], ip_reader.city(ip).country.names['en'])
+                            if location not in remove_locations:
+                                add_location = True
+                                if geo_location.get(location, None) is None:
+                                    geo_location[location] = {'lon': ip_reader.city(ip).location.longitude,
+                                                              'lat': ip_reader.city(ip).location.latitude,
+                                                              'count': 1}
+                                else:
+                                    geo_location[location]['count'] += 1
                         except:
-                            location = 'Could not find location'
+                            if 'None' not in remove_locations:
+                                add_location = True
+                                location = 'Could not find location'
+                                geo_location['None']['count'] += 1
 
-                        visitors.append({'ip': ip, 'location': location, 'agent': agent, 'time': time})
+                        # make sure this location should be added
+                        if add_location:
+                            # add to this date
+                            if daily_views.get(time.date(), None) is None:
+                                daily_views[time.date()] = 1
+                            else:
+                                daily_views[time.date()] += 1
+                            actual_count += 1
+                            if ip not in ip_track:
+                                ip_track.append(ip)
+                                unique_count += 1
+                            visitors.append({'ip': ip, 'location': location, 'agent': agent, 'time': time})
 
                             # print('{0}, {1}'.format(ip_reader.city(ip).city.names['en'], ip_reader.city(ip).country.names['en']))
-                    stats['url_stats'].append({'url': url, 'total_count': count,
-                                               'unique_count': pageviews.filter(url__contains=url).values('visitor').distinct().count(),
+                    # stats['url_stats'].append({'url': url, 'total_count': count,
+                    #                            'unique_count': pageviews.filter(url__contains=url).values('visitor').distinct().count(),
+                    #                            'visitors': visitors
+                    #                            })
+                    stats['url_stats'].append({'url': url, 'total_count': actual_count,
+                                               'unique_count': unique_count,
                                                'visitors': visitors
                                                })
                     # visitor_stats[]
@@ -291,4 +343,16 @@ class PageviewManager(models.Manager):
         # Finish setting the total visitor counts
         stats['unique'] = unique_count
 
+        # save the geo location stats
+        stats['geo_location'] = geo_location
+
+        # save the daily views
+        stats['daily views'] = daily_views
+
         return stats
+
+    def exclude_from_query_set(self, query, values):
+        return query.exclues(reduce(operator.and_, (Q(first_name__contains=x) for x in values)))
+
+    def filter_from_query_set(self, query, values):
+        return query.filter(reduce(operator.and_, (Q(first_name__contains=x) for x in values)))

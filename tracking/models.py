@@ -44,6 +44,10 @@ class Visitor(models.Model):
     time_on_site = models.IntegerField(null=True, editable=False)
     end_time = models.DateTimeField(null=True, editable=False)
 
+    # track if this user had mouse clicks or movements to help eliminate bots
+    mouse_click = models.BooleanField(null=True)
+    mouse_movement = models.BooleanField(null=True)
+
     objects = VisitorManager()
 
     def session_expired(self):

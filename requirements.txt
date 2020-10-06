@@ -1,1 +1,1 @@
-django-congo
+django==3.0.6

@@ -11,6 +11,9 @@ from django.utils.timezone import now
 
 from tracking.models import Visitor, Pageview
 from tracking.settings import TRACK_PAGEVIEWS
+# from dash_cjm.plots.Plotting2DApp import StaticPlotting2DApp
+from tracking.dashboard import TrackingDashboard
+
 
 log = logging.getLogger(__file__)
 
@@ -27,6 +30,11 @@ input_formats = [
 class DashboardForm(forms.Form):
     start = forms.DateTimeField(required=False, input_formats=input_formats)
     end = forms.DateTimeField(required=False, input_formats=input_formats)
+
+
+def record_mouse_click(request):
+    a = 5
+    return 
 
 
 @permission_required('tracking.visitor_log')
@@ -78,9 +86,18 @@ class ConDashboard(LoginRequiredMixin, TemplateView):
 
     def get(self, request, *args, **kwargs):
 
-        pageview_stats = Pageview.objects.stats()
+        # pageview_stats = Pageview.objects.stats()
+        #
+        # context = {
+        #     'pageview_stats': pageview_stats,
+        # }
 
-        context = {
-            'pageview_stats': pageview_stats,
-        }
-        return render(request, self.template_name, context)
+        dash = TrackingDashboard(name='test', django=True)
+
+        # plot = StaticPlotting2DApp(name='tracking_time', y_variables=['number'], x_variables=['time'],
+        #                            compute_function=lambda x: {'number': [0, 1], 'time': [7, 8]}, django=False, class_name='class')
+
+        # plot.build_app()
+        # plot.app.run_server(debug=True)
+        return render(request, self.template_name)
+        # return render(request, self.template_name, context)

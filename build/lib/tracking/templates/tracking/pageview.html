@@ -1,8 +1,11 @@
-{% extends 'congo/includes/index.html' %}
+{% extends 'tracking/index_tracking.html' %}
+
 
 {% block nav %}
 {% endblock %}
 
 {% block content %}
-    {% include 'tracking/pageview_card.html' with table_name='pageview_table'%}
+
+    {% include 'tracking/pageview_card_test.html'%}
+{#    {% include 'tracking/pageview_card.html' with table_name='pageview_table'%}#}
 {% endblock %}

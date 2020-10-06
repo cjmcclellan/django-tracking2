@@ -75,43 +75,62 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # 'congo'
-    # add tracking as INSTALLED_APPS
+    'main.apps.MainConfig',
+    'django_plotly_dash.apps.DjangoPlotlyDashConfig',
     'tracking',
-    'congo'
+    'congo',
 )
 
-if django.VERSION < (1, 10):
-    MIDDLEWARE_CLASSES = (
-        # make sure tracking middleware is before SessionMiddleware
-        'tracking.middleware.VisitorTrackingMiddleware',
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_plotly_dash.middleware.BaseMiddleware',
+    'django_plotly_dash.middleware.ExternalRedirectionMiddleware',
 
-        'django.contrib.sessions.middleware.SessionMiddleware',
-        'django.middleware.common.CommonMiddleware',
-        'django.middleware.csrf.CsrfViewMiddleware',
-        'django.contrib.auth.middleware.AuthenticationMiddleware',
-        'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
-        'django.contrib.messages.middleware.MessageMiddleware',
-        'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    )
-else:
-    MIDDLEWARE = [
-        # make sure tracking middleware is before SessionMiddleware
-        'tracking.middleware.VisitorTrackingMiddleware',
+]
 
-        'django.middleware.security.SecurityMiddleware',
-        'django.contrib.sessions.middleware.SessionMiddleware',
-        'django.middleware.common.CommonMiddleware',
-        'django.middleware.csrf.CsrfViewMiddleware',
-        'django.contrib.auth.middleware.AuthenticationMiddleware',
-        'django.contrib.messages.middleware.MessageMiddleware',
-        'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    ]
+# if django.VERSION < (1, 10):
+#     MIDDLEWARE_CLASSES = (
+#         # make sure tracking middleware is before SessionMiddleware
+#         'tracking.middleware.VisitorTrackingMiddleware',
+#
+#         'django.contrib.sessions.middleware.SessionMiddleware',
+#         'django.middleware.common.CommonMiddleware',
+#         'django.middleware.csrf.CsrfViewMiddleware',
+#         'django.contrib.auth.middleware.AuthenticationMiddleware',
+#         'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+#         'django.contrib.messages.middleware.MessageMiddleware',
+#         'django.middleware.clickjacking.XFrameOptionsMiddleware',
+#         'django_plotly_dash.middleware.BaseMiddleware',
+#
+#     )
+# else:
+#     MIDDLEWARE = [
+#         # make sure tracking middleware is before SessionMiddleware
+#         'tracking.middleware.VisitorTrackingMiddleware',
+#
+#         'django.middleware.security.SecurityMiddleware',
+#         'django.contrib.sessions.middleware.SessionMiddleware',
+#         'django.middleware.common.CommonMiddleware',
+#         'django.middleware.csrf.CsrfViewMiddleware',
+#         'django.contrib.auth.middleware.AuthenticationMiddleware',
+#         'django.contrib.messages.middleware.MessageMiddleware',
+#         'django.middleware.clickjacking.XFrameOptionsMiddleware',
+#         'django_plotly_dash.middleware.BaseMiddleware',
+#     ]
 
 ROOT_URLCONF = 'example.urls'
 
 WSGI_APPLICATION = 'example.wsgi.application'
 
+PLOTLY_DASH = {
+    'cache_arguments': False
+}
 
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
