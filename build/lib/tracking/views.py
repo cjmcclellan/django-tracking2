@@ -40,6 +40,13 @@ def record_mouse_click(request):
     return HttpResponse('')
 
 
+def record_mouse_movement(request):
+    visitor = Visitor.objects.get(session_key__exact=request.session.session_key)
+    visitor.mouse_movement = True
+    visitor.save()
+    return HttpResponse('')
+
+
 @permission_required('tracking.visitor_log')
 def dashboard(request):
     "Counts, aggregations and more!"

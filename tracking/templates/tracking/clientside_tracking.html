@@ -1,12 +1,19 @@
 {#Insert this html into the page you want to track to flag mouse movements and clicks (i.e. help with bot detection)#}
 
 <script>
-    document.body.addEventListener('click', function(){
-        console.log('mouse click!');
+    document.body.addEventListener('click', update_click);
+    function update_click (){
         $.ajax({
             url: '/tracking/ajax/mouse_click',
-            {#datatype: 'json',#}
-            {#success:#}
-        })
-    });
+        });
+        document.body.removeEventListener('click', update_click);
+    }
+
+    document.body.addEventListener('mousemove', update_movement);
+    function update_movement (){
+        $.ajax({
+            url: '/tracking/ajax/mouse_movement',
+        });
+        document.body.removeEventListener('mousemove', update_movement);
+    }
 </script>
