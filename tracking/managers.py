@@ -288,7 +288,8 @@ class PageviewManager(models.Manager):
                                 ip_track.append(ip)
                                 unique_count += 1
                             visitors.append({'ip': ip, 'location': location, 'agent': agent, 'time': time,
-                                             'mouse click': pageview.visitor.mouse_click, 'mouse move': pageview.visitor.mouse_movement})
+                                             'mouse click': 'not recorded' if pageview.visitor.mouse_click is None else pageview.visitor.mouse_click,
+                                             'mouse move': 'not recorded' if pageview.visitor.mouse_movement is None else pageview.visitor.mouse_movement})
 
                             # print('{0}, {1}'.format(ip_reader.city(ip).city.names['en'], ip_reader.city(ip).country.names['en']))
                     # stats['url_stats'].append({'url': url, 'total_count': count,
