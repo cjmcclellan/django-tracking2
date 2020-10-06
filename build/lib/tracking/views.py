@@ -8,6 +8,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.timezone import now
+from django.http import HttpResponse
 
 from tracking.models import Visitor, Pageview
 from tracking.settings import TRACK_PAGEVIEWS
@@ -33,8 +34,10 @@ class DashboardForm(forms.Form):
 
 
 def record_mouse_click(request):
-    a = 5
-    return 
+    visitor = Visitor.objects.get(session_key__exact=request.session.session_key)
+    visitor.mouse_click = True
+    visitor.save()
+    return HttpResponse('')
 
 
 @permission_required('tracking.visitor_log')
