@@ -91,7 +91,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_plotly_dash.middleware.BaseMiddleware',
     'django_plotly_dash.middleware.ExternalRedirectionMiddleware',
-
+    'tracking.middleware.VisitorTrackingMiddleware',
 ]
 
 # if django.VERSION < (1, 10):

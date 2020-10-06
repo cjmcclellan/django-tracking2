@@ -45,8 +45,8 @@ class Visitor(models.Model):
     end_time = models.DateTimeField(null=True, editable=False)
 
     # track if this user had mouse clicks or movements to help eliminate bots
-    mouse_click = models.BooleanField(null=True)
-    mouse_movement = models.BooleanField(null=True)
+    mouse_click = models.BooleanField(default=False)
+    mouse_movement = models.BooleanField(default=False)
 
     objects = VisitorManager()
 

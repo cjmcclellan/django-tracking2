@@ -287,7 +287,7 @@ class PageviewManager(models.Manager):
                             if ip not in ip_track:
                                 ip_track.append(ip)
                                 unique_count += 1
-                            visitors.append({'ip': ip, 'location': location, 'agent': agent, 'time': time})
+                            visitors.append({'ip': ip, 'location': location, 'agent': agent, 'time': time, 'mouse click': pageview.visitor.mouse_click})
 
                             # print('{0}, {1}'.format(ip_reader.city(ip).city.names['en'], ip_reader.city(ip).country.names['en']))
                     # stats['url_stats'].append({'url': url, 'total_count': count,
