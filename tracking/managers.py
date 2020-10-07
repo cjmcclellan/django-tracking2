@@ -192,7 +192,7 @@ class VisitorManager(CacheManager):
 
 
 class PageviewManager(models.Manager):
-    def stats(self, start_date=None, end_date=None, registered_only=False, filter_agents=None, remove_locations=None):
+    def stats(self, start_date=None, end_date=None, registered_only=False, filter_agents=None, remove_locations=None, mouse_behavior=None):
         """Returns a dictionary of pageviews including:
 
             * total pageviews
@@ -220,6 +220,12 @@ class PageviewManager(models.Manager):
                 pageviews = pageviews.exclude(visitor__user_agent__contains=agent)
                 # pageviews = pageviews.exclude(reduce(operator.and_, (Q(visitor__user_agent__contains=x) for x in filter_agents)))
 
+        # filter out visitors without mouse behavior
+        if mouse_behavior is not None:
+            if 'click' in mouse_behavior:
+                pageviews = pageviews.filter(visitor__mouse_click=True)
+            if 'movement' in mouse_behavior:
+                pageviews = pageviews.filter(visitor__mouse_movement=True)
         # get all the unique urls
 
         stats = {
@@ -252,8 +258,6 @@ class PageviewManager(models.Manager):
                     # create the visitor list
                     visitors = []
                     for pageview in pageviews.filter(url__contains=url):
-                    # for ip, agent in zip(list(pageviews.filter(url__contains=url).values('visitor__ip_address')),
-                    #                      list(pageviews.filter(url__contains=url).values('visitor__user_agent'))):
 
                         ip = pageview.visitor.ip_address
                         agent = pageview.visitor.user_agent
